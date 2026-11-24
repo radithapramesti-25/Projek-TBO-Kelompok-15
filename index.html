@@ -7,7 +7,79 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <style>
+:root{
+  --bg:#e8eee9; --panel:#f7f9f5; --ink:#18262b; --muted:#5b6b70; --line:#c9d4cd;
+  --off:#37434a; --amber:#ff9f1c; --green:#2ec27e; --red:#e5484d; --accent:#1f5f6b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Sora',system-ui,sans-serif;line-height:1.55;padding:28px 18px 48px}
+.top,.grid{max-width:980px;margin:0 auto}
+.top h1{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:800;margin:0 0 6px;letter-spacing:-.02em}
+.top p{margin:0 0 24px;color:var(--muted);max-width:60ch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.wide{grid-column:1/-1}
+.panel,.device{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+h2{font-size:1rem;margin:0 0 12px;font-weight:600}
+.panel h2:not(:first-child){margin-top:22px}
+
+/* perangkat */
+.device{display:flex;flex-direction:column;align-items:center;gap:22px;background:#dfe7e1}
+.charger{width:100%;max-width:260px;background:#22323a;border-radius:26px;padding:30px 20px 24px;text-align:center;color:#eaf1ee;box-shadow:0 14px 0 #162228}
+.led{width:76px;height:76px;border-radius:50%;margin:0 auto 18px;background:var(--off);border:4px solid #11191d;transition:background .25s,box-shadow .25s}
+.led.off{background:var(--off);box-shadow:none}
+.led.amber{background:var(--amber);box-shadow:0 0 34px 8px rgba(255,159,28,.6);animation:breathe 2s ease-in-out infinite}
+.led.green{background:var(--green);box-shadow:0 0 34px 8px rgba(46,194,126,.6)}
+.led.red{background:var(--red);box-shadow:0 0 34px 8px rgba(229,72,77,.65);animation:blink .7s steps(1) infinite}
+@keyframes breathe{50%{box-shadow:0 0 14px 2px rgba(255,159,28,.35)}}
+@keyframes blink{50%{background:#5a2326;box-shadow:none}}
+.state-name{font-size:1.5rem;font-weight:800}
+.state-desc{font-size:.85rem;color:#b7c6c1;min-height:2.6em}
+.battery{display:flex;align-items:center;gap:12px;width:100%;max-width:260px}
+.bar{flex:1;height:18px;border:2px solid var(--ink);border-radius:6px;padding:2px;background:#f7f9f5}
+.fill{height:100%;width:20%;background:var(--accent);border-radius:2px;transition:width .12s linear}
+#levelText{font-weight:600;min-width:3.2ch;text-align:right}
+
+/* tombol */
+.btns{display:grid;gap:8px;margin-bottom:10px}
+button{font:inherit;font-weight:600;font-size:.9rem;padding:10px 14px;border-radius:9px;border:2px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;text-align:left}
+button:hover{background:var(--accent);border-color:var(--accent)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+button.ghost{background:transparent;color:var(--ink);width:100%}
+button.ghost:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* log */
+.log{margin:0;padding-left:20px;max-height:170px;overflow:auto;font-size:.88rem;color:var(--muted)}
+.log li{padding:2px 0}
+.log b{color:var(--ink)}
+
+/* tabel */
+.formal{font-size:.92rem;background:#edf2ee;border-left:4px solid var(--accent);padding:10px 14px;margin:0 0 14px;border-radius:0 8px 8px 0}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:.9rem}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+th{background:#edf2ee;font-weight:600}
+td:first-child,th:first-child{text-align:left}
+tr.now td:first-child{background:var(--ink);color:#fff;font-weight:600}
+td.last{background:var(--amber);font-weight:800}
+.final::after{content:" ◎"}
+.start::before{content:"→ "}
+
+/* uji string */
+.hint{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+code{background:#e3eae5;padding:1px 6px;border-radius:5px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+input{font:inherit;flex:1;min-width:160px;padding:10px 12px;border:2px solid var(--ink);border-radius:9px;background:#fff;letter-spacing:.12em;text-transform:uppercase}
+.trace{margin-top:14px;font-size:.9rem;display:flex;flex-wrap:wrap;gap:6px 4px;align-items:center}
+.chip{background:#e3eae5;border-radius:7px;padding:3px 9px}
+.arrow{color:var(--muted);font-size:.8rem}
+.verdict{margin-top:12px;font-weight:800}
+.verdict.ok{color:#17804f}.verdict.no{color:var(--red)}
+
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){.led{animation:none!important}.fill{transition:none}}
+
+</style>
 </head>
 <body>
   <header class="top">
@@ -70,6 +142,140 @@
     </section>
   </main>
 
-  <script src="script.js"></script>
+  <script>
+document.addEventListener('DOMContentLoaded', () => {
+// ===== Definisi DFA =====
+const STATES = {
+  Mati:    { led: 'off',   desc: 'Charger belum terhubung ke HP.' },
+  Mengisi: { led: 'amber', desc: 'HP sedang diisi daya.' },
+  Penuh:   { led: 'green', desc: 'Baterai sudah penuh. Aman dicabut.' },
+  Error:   { led: 'red',   desc: 'Ada gangguan. Cabut HP atau tekan Reset.' }
+};
+const START = 'Mati';
+const ACCEPT = ['Penuh'];
+const ALPHABET = ['P', 'U', 'F', 'E', 'R'];
+const NAMES = { P: 'Colok', U: 'Cabut', F: 'Penuh', E: 'Gangguan', R: 'Reset' };
+
+// δ(state, simbol) -> state berikutnya (fungsi total: semua pasangan terdefinisi)
+const DELTA = {
+  Mati:    { P: 'Mengisi', U: 'Mati',  F: 'Mati',    E: 'Mati',  R: 'Mati' },
+  Mengisi: { P: 'Mengisi', U: 'Mati',  F: 'Penuh',   E: 'Error', R: 'Mengisi' },
+  Penuh:   { P: 'Penuh',   U: 'Mati',  F: 'Penuh',   E: 'Error', R: 'Penuh' },
+  Error:   { P: 'Error',   U: 'Mati',  F: 'Error',   E: 'Error', R: 'Mati' }
+};
+
+// ===== Elemen =====
+const $ = id => {
+  const e = document.getElementById(id);
+  if (!e) { console.warn('Elemen #' + id + ' tidak ditemukan di HTML'); return document.createElement('div'); }
+  return e;
+};
+const led = $('led'), stateName = $('stateName'), stateDesc = $('stateDesc');
+const level = $('level'), levelText = $('levelText'), logEl = $('log'), table = $('table');
+
+let current = START;
+let battery = 20;
+let last = null; // { from, sym }
+
+// ===== Tabel transisi =====
+function buildTable() {
+  let h = '<thead><tr><th>δ</th>' + ALPHABET.map(s => `<th>${s}<br><small>${NAMES[s]}</small></th>`).join('') + '</tr></thead><tbody>';
+  for (const q of Object.keys(DELTA)) {
+    const cls = [q === START ? 'start' : '', ACCEPT.includes(q) ? 'final' : ''].join(' ');
+    h += `<tr data-q="${q}"><td class="${cls}">${q}</td>` +
+         ALPHABET.map(s => `<td data-s="${s}">${DELTA[q][s]}</td>`).join('') + '</tr>';
+  }
+  table.innerHTML = h + '</tbody>';
+}
+
+function render() {
+  const s = STATES[current];
+  led.className = 'led ' + s.led;
+  led.setAttribute('aria-label', 'Lampu indikator: ' + current);
+  stateName.textContent = current;
+  stateDesc.textContent = s.desc;
+  level.style.width = battery + '%';
+  levelText.textContent = Math.round(battery) + '%';
+
+  table.querySelectorAll('tr').forEach(r => r.classList.toggle('now', r.dataset.q === current));
+  table.querySelectorAll('td.last').forEach(c => c.classList.remove('last'));
+  if (last) {
+    const cell = table.querySelector(`tr[data-q="${last.from}"] td[data-s="${last.sym}"]`);
+    if (cell) cell.classList.add('last');
+  }
+}
+
+function addLog(from, sym, to) {
+  const li = document.createElement('li');
+  li.innerHTML = `<b>${from}</b> --${sym}--> <b>${to}</b>`;
+  logEl.prepend(li);
+  while (logEl.children.length > 30) logEl.lastChild.remove();
+}
+
+// ===== Satu langkah DFA =====
+function step(sym) {
+  const from = current;
+  const to = DELTA[from][sym];
+  last = { from, sym };
+  current = to;
+  addLog(from, sym, to);
+  render();
+}
+
+// ===== Tombol input =====
+document.querySelectorAll('[data-sym]').forEach(b =>
+  b.addEventListener('click', () => step(b.dataset.sym)));
+
+$('btnUse').addEventListener('click', () => { battery = 20; render(); });
+
+// ===== Simulasi pengisian baterai =====
+setInterval(() => {
+  if (current !== 'Mengisi') return;
+  battery = Math.min(100, battery + 1);
+  if (battery >= 100) step('F'); // baterai penuh -> input F otomatis
+  else render();
+}, 150);
+
+// ===== Uji string =====
+function runString(str) {
+  let q = START;
+  const path = [q];
+  for (const ch of str) {
+    q = DELTA[q][ch];
+    path.push(q);
+  }
+  return { path, accepted: ACCEPT.includes(q) };
+}
+
+$('btnRun').addEventListener('click', () => {
+  const str = $('strInput').value.toUpperCase().replace(/\s+/g, '');
+  const trace = $('trace'), verdict = $('verdict');
+  const bad = [...str].filter(c => !ALPHABET.includes(c));
+  if (!str || bad.length) {
+    trace.innerHTML = '';
+    verdict.className = 'verdict no';
+    verdict.textContent = bad.length
+      ? 'Simbol tidak dikenal: ' + [...new Set(bad)].join(', ') + '. Gunakan P, U, F, E, R.'
+      : 'Isi urutan input dulu.';
+    return;
+  }
+  const { path, accepted } = runString(str);
+  let html = `<span class="chip">${path[0]}</span>`;
+  for (let i = 0; i < str.length; i++)
+    html += `<span class="arrow">--${str[i]}--&gt;</span><span class="chip">${path[i + 1]}</span>`;
+  trace.innerHTML = html;
+  verdict.className = 'verdict ' + (accepted ? 'ok' : 'no');
+  verdict.textContent = accepted
+    ? `Diterima: berakhir di ${path.at(-1)} (keadaan akhir).`
+    : `Ditolak: berakhir di ${path.at(-1)}, bukan keadaan akhir.`;
+});
+$('strInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnRun').click(); });
+
+buildTable();
+render();
+$('btnRun').click();
+});
+
+</script>
 </body>
 </html>
