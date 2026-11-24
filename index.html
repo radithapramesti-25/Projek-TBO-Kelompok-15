@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulasi Lampu Indikator Charger HP dengan DFA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Lampu indikator charger HP</h1>
+    <p>Simulasi Deterministic Finite Automata (DFA): setiap input memindahkan lampu ke tepat satu keadaan.</p>
+  </header>
+
+  <main class="grid">
+    <!-- PERANGKAT -->
+    <section class="device" aria-label="Perangkat charger">
+      <div class="charger">
+        <div id="led" class="led off" role="img" aria-label="Lampu indikator mati"></div>
+        <div id="stateName" class="state-name">Mati</div>
+        <div id="stateDesc" class="state-desc">Charger belum terhubung ke HP.</div>
+      </div>
+      <div class="battery" aria-label="Level baterai">
+        <div class="bar"><div id="level" class="fill"></div></div>
+        <span id="levelText">20%</span>
+      </div>
+    </section>
+
+    <!-- KONTROL -->
+    <section class="panel" aria-label="Kontrol input">
+      <h2>Input</h2>
+      <div class="btns">
+        <button data-sym="P">P &middot; Colok HP</button>
+        <button data-sym="U">U &middot; Cabut HP</button>
+        <button data-sym="F">F &middot; Baterai penuh</button>
+        <button data-sym="E">E &middot; Gangguan</button>
+        <button data-sym="R">R &middot; Reset</button>
+      </div>
+      <button id="btnUse" class="ghost">Pakai HP (baterai jadi 20%)</button>
+
+      <h2>Riwayat transisi</h2>
+      <ol id="log" class="log"></ol>
+    </section>
+
+    <!-- DEFINISI DFA -->
+    <section class="panel wide" aria-label="Definisi DFA">
+      <h2>Definisi DFA</h2>
+      <p class="formal">
+        Q = {Mati, Mengisi, Penuh, Error} &nbsp; Σ = {P, U, F, E, R}<br>
+        q₀ = Mati &nbsp; F = {Penuh} &nbsp; δ: Q × Σ → Q
+      </p>
+      <div class="scroll">
+        <table id="table"></table>
+      </div>
+    </section>
+
+    <!-- UJI STRING -->
+    <section class="panel wide" aria-label="Uji string">
+      <h2>Uji urutan input</h2>
+      <p class="hint">Ketik urutan simbol (contoh: <code>PF</code>, <code>PEU</code>, <code>PFU</code>). String diterima jika berakhir di keadaan akhir <b>Penuh</b>.</p>
+      <div class="row">
+        <input id="strInput" type="text" value="PF" maxlength="40" autocomplete="off" spellcheck="false" aria-label="String input">
+        <button id="btnRun">Jalankan</button>
+      </div>
+      <div id="trace" class="trace"></div>
+      <div id="verdict" class="verdict"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
