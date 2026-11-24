@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', () => {
 // ===== Definisi DFA =====
 const STATES = {
   Mati:    { led: 'off',   desc: 'Charger belum terhubung ke HP.' },
@@ -19,7 +20,11 @@ const DELTA = {
 };
 
 // ===== Elemen =====
-const $ = id => document.getElementById(id);
+const $ = id => {
+  const e = document.getElementById(id);
+  if (!e) { console.warn('Elemen #' + id + ' tidak ditemukan di HTML'); return document.createElement('div'); }
+  return e;
+};
 const led = $('led'), stateName = $('stateName'), stateDesc = $('stateDesc');
 const level = $('level'), levelText = $('levelText'), logEl = $('log'), table = $('table');
 
@@ -124,3 +129,4 @@ $('strInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('btnRu
 buildTable();
 render();
 $('btnRun').click();
+});
